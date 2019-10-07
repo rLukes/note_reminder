@@ -39,7 +39,7 @@ class DatabaseHelper {
   void _createDB(Database db, int version) async {
     await db.execute(
         'CREATE TABLE $noteTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, '
-            '$colDescription TEXT, $colPriority INTEGER, $colDate TEXT)');
+        '$colDescription TEXT, $colPriority INTEGER, $colDate TEXT)');
   }
 
   Future<Database> get database async {
@@ -49,37 +49,50 @@ class DatabaseHelper {
     return _db;
   }
 
-  Future<List<Map<String, dynamic>>>getNoteMapList() async {
+  Future<List<Map<String, dynamic>>> getNoteMapList() async {
     Database db = await this.database;
-    var result = db.rawQuery(
-        "SELECT * FROM $noteTable order by $colPriority ASC");
+    var result =
+        db.rawQuery("SELECT * FROM $noteTable order by $colPriority ASC");
     //SAME AS ABOVE
     //var result = db.query(noteTable, orderBy: '$colPriority ASC')
     return result;
   }
 
-  Future<int> insertNote(Note note) async{
+  Future<int> insertNote(Note note) async {
     Database db = await this.database;
     var result = await db.insert(this.noteTable, note.toMap());
     return result;
   }
 
-  Future<int> updateNote(Note note) async{
+  Future<int> updateNote(Note note) async {
     var db = await this.database;
-    var result = await db.update(noteTable, note.toMap(), where: '$colId = ?', whereArgs: [note.id]);
+    var result = await db.update(noteTable, note.toMap(),
+        where: '$colId = ?', whereArgs: [note.id]);
     return result;
   }
 
-  Future<int> deleteNote(int id) async{
+  Future<int> deleteNote(int id) async {
     Database db = await this.database;
-    int result = await db.rawDelete('DELETE FROM $noteTable WHERE $colId = $id');
+    int result =
+        await db.rawDelete('DELETE FROM $noteTable WHERE $colId = $id');
     return result;
   }
 
-  Future<int> getCount() async{
+  Future<int> getCount() async {
     Database db = await this.database;
-    List<Map<String, dynamic>> num = await db.rawQuery("SELECT COUNT(*) FROM $noteTable");
+    List<Map<String, dynamic>> num =
+        await db.rawQuery("SELECT COUNT(*) FROM $noteTable");
     int result = Sqflite.firstIntValue(num);
     return result;
+  }
+
+  Future<List<Note>> getNoteList() async {
+    var noteMapLIst = await getNoteMapList();
+    int count = noteMapLIst.length;
+    List<Note> noteList = List<Note>();
+    for (int i = 0; i < count; i++) {
+      noteList.add(Note.fromMap(noteMapLIst[i]));
+    }
+    return noteList;
   }
 }

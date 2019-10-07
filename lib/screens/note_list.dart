@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:note_reminder/note_detail.dart';
+import 'package:note_reminder/screens/note_detail.dart';
+import 'package:note_reminder/model/note.dart';
+import 'package:note_reminder/utils/db_helper.dart';
+import 'package:sqflite/sqflite.dart';
 
 class NoteList extends StatefulWidget {
   @override
@@ -7,10 +10,17 @@ class NoteList extends StatefulWidget {
 }
 
 class _NoteListState extends State<NoteList> {
-  int count = 1;
+  int count = 0;
+  DatabaseHelper dbHelper = DatabaseHelper();
+  List<Note> noteList;
 
   @override
   Widget build(BuildContext context) {
+    if (noteList != null) {
+      noteList = List<Note>();
+      updateListView();
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Note Reminder'),
@@ -20,7 +30,9 @@ class _NoteListState extends State<NoteList> {
         child: Icon(Icons.add),
         onPressed: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return NoteDetail(title: "Add Note",);
+            return NoteDetail(
+              title: "Add Note",
+            );
           }));
         },
       ),
@@ -28,28 +40,39 @@ class _NoteListState extends State<NoteList> {
   }
 
   getNoteListView() {
-    TextStyle titleStyle = Theme.of(context).textTheme.subhead;
+    TextStyle titleStyle = Theme
+        .of(context)
+        .textTheme
+        .subhead;
     return ListView.builder(
       itemBuilder: (BuildContext context, int index) {
+        Note currentNote = this.noteList[index];
         return Card(
           color: Colors.white,
           elevation: 2.0,
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: Colors.blueGrey,
-              child: Icon(Icons.keyboard_arrow_right),
+              backgroundColor: getPriorityColor(currentNote.priority),
+              child: getPriorityIcon(currentNote.priority),
             ),
             title: Text(
-              "dummy title",
-              style: titleStyle, 
+              currentNote.title,
+              style: titleStyle,
             ),
-            subtitle: Text("dummy data"),
-            trailing: Icon(Icons.delete, color: Colors.grey),
+            subtitle: Text(currentNote.date),
+            trailing: GestureDetector(
+              child: Icon(Icons.delete, color: Colors.grey),
+              onTap: () {
+                _deleteNote(context, currentNote);
+              },
+            ),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) {
-                  return NoteDetail(title: "Edit Note",);
+                  return NoteDetail(
+                    title: "Edit Note",
+                  );
                 }),
               );
             },
@@ -58,5 +81,60 @@ class _NoteListState extends State<NoteList> {
       },
       itemCount: count,
     );
+  }
+
+  Color getPriorityColor(int p) {
+    switch (p) {
+      case 1:
+        return Colors.red;
+        break;
+      case 2:
+        return Colors.green;
+        break;
+
+      default:
+        return Colors.green;
+    }
+  }
+
+  Icon getPriorityIcon(int p) {
+    switch (p) {
+      case 1:
+        return Icon(Icons.play_arrow);
+        break;
+
+      case 2:
+        return Icon(Icons.keyboard_arrow_right);
+        break;
+
+      default:
+        return Icon(Icons.keyboard_arrow_right);
+    }
+  }
+
+  void _deleteNote(BuildContext ctx, Note note) async {
+    int result = await this.dbHelper.deleteNote(note.id);
+    if (result != 0) {
+      _showSnackBar(ctx, 'Note deleted');
+      updateListView();
+    }
+  }
+
+  void _showSnackBar(BuildContext ctx, String msg) {
+    final snackBar = SnackBar(content: Text(msg));
+    Scaffold.of(ctx).showSnackBar(snackBar);
+  }
+
+  void updateListView() {
+    final Future<Database> dbFuture = dbHelper.initializeDatabase();
+    dbFuture.then((db) {
+      Future<List<Note>> noteListFuture = dbHelper.getNoteList();
+      noteListFuture.then((list) {
+        setState(() {
+          this.noteList = list;
+          this.count = noteList.length;
+        });
+      });
+    });
   }
 }
