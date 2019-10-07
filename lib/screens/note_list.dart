@@ -6,17 +6,49 @@ class NoteList extends StatefulWidget {
 }
 
 class _NoteListState extends State<NoteList> {
+  int count = 1;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notes'),
+        title: Text('Note Reminder'),
       ),
       body: getNoteListView(),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: (){
+
+        },
+      ),
     );
   }
 
-  getNoteListView(){
-    return Center(child: Text("notes..."),);
+  getNoteListView() {
+    TextStyle titleStyle = Theme.of(context).textTheme.subhead;
+    return ListView.builder(
+      itemBuilder: (BuildContext context, int index) {
+        return Card(
+          color: Colors.white,
+          elevation: 2.0,
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Colors.blueGrey,
+              child: Icon(Icons.keyboard_arrow_right),
+            ),
+            title: Text(
+              "dummy title",
+              style: titleStyle,
+            ),
+            subtitle: Text("dummy data"),
+            trailing: Icon(Icons.delete, color: Colors.grey),
+            onTap: () {
+
+            },
+          ),
+        );
+      },
+      itemCount: count,
+    );
   }
 }
