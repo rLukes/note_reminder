@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:note_reminder/note_detail.dart';
 
 class NoteList extends StatefulWidget {
   @override
@@ -17,8 +18,10 @@ class _NoteListState extends State<NoteList> {
       body: getNoteListView(),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: (){
-
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return NoteDetail(title: "Add Note",);
+          }));
         },
       ),
     );
@@ -38,12 +41,17 @@ class _NoteListState extends State<NoteList> {
             ),
             title: Text(
               "dummy title",
-              style: titleStyle,
+              style: titleStyle, 
             ),
             subtitle: Text("dummy data"),
             trailing: Icon(Icons.delete, color: Colors.grey),
             onTap: () {
-
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return NoteDetail(title: "Edit Note",);
+                }),
+              );
             },
           ),
         );

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 class NoteDetail extends StatefulWidget {
+  final String title;
+
+  NoteDetail({this.title});
+
   @override
   _NoteDetailState createState() => _NoteDetailState();
 }
@@ -15,7 +19,7 @@ class _NoteDetailState extends State<NoteDetail> {
     TextStyle txtStyle = Theme.of(context).textTheme.title;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Edit Note"),
+        title: Text(widget.title),
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 15.0, left: 10.0, right: 10.0),
