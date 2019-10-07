@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:note_reminder/note_detail.dart';
 import 'package:note_reminder/screens/note_list.dart';
 
 void main() => runApp(NoteReminder());
@@ -13,7 +14,7 @@ class NoteReminder extends StatelessWidget {
         primarySwatch: Colors.deepOrange
       ),
       home: Center(
-        child: NoteList()
+        child: NoteDetail()
       ),
     );
   }
