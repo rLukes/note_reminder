@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:note_reminder/model/note.dart';
 import 'package:note_reminder/utils/db_helper.dart';
 
@@ -43,9 +44,11 @@ class _NoteDetailState extends State<NoteDetail> {
                   );
                 }).toList(),
                 style: txtStyle,
-                value: 'Low',
+                value: getPriorityValue(note.priority),
                 onChanged: (value) {
-                  setState(() {});
+                  setState(() {
+                    setPriorityValue(value);
+                  });
                 },
               ),
             ),
@@ -60,7 +63,9 @@ class _NoteDetailState extends State<NoteDetail> {
                 ),
                 controller: titleController,
                 style: txtStyle,
-                onChanged: (value) {},
+                onChanged: (value) {
+                  note.title = titleController.text;
+                },
               ),
             ),
             Padding(
@@ -74,7 +79,9 @@ class _NoteDetailState extends State<NoteDetail> {
                 ),
                 controller: descriptionController,
                 style: txtStyle,
-                onChanged: (value) {},
+                onChanged: (value) {
+                  note.description = descriptionController.text;
+                },
               ),
             ),
             Padding(
@@ -90,7 +97,9 @@ class _NoteDetailState extends State<NoteDetail> {
                         textScaleFactor: 1.5,
                       ),
                       onPressed: () {
-                        setState(() {});
+                        setState(() {
+                          _save();
+                        });
                       },
                     ),
                   ),
@@ -106,7 +115,9 @@ class _NoteDetailState extends State<NoteDetail> {
                         textScaleFactor: 1.5,
                       ),
                       onPressed: () {
-                        setState(() {});
+                        setState(() {
+                          _delete();
+                        });
                       },
                     ),
                   )
@@ -119,7 +130,7 @@ class _NoteDetailState extends State<NoteDetail> {
     );
   }
 
-  void getPriorityValue(String value) {
+  void setPriorityValue(String value) {
     switch (value) {
       case 'High':
         note.priority = 1;
@@ -127,6 +138,52 @@ class _NoteDetailState extends State<NoteDetail> {
       case 'Low':
         note.priority = 2;
         break;
+    }
+  }
+
+  String getPriorityValue(int value) {
+    String priority;
+    switch (value) {
+      case 1:
+        priority = _priorities[0];
+        break;
+      case 2:
+        priority = _priorities[1];
+        break;
+    }
+    return priority;
+  }
+
+  void _showAlertDialog(String title, String msg) {
+    AlertDialog alertDialog = AlertDialog(
+      title: Text(title),
+      content: Text(msg),
+    );
+    showDialog(context: context, builder: (_) => alertDialog);
+  }
+
+  void _delete() async {
+    Navigator.pop(context, true);
+    if (note.id == null) {
+      _showAlertDialog("Status", "No note was deleted");
+      return;
+    }
+    await dbHelper.deleteNote(note.id);
+  }
+
+  void _save() async {
+    Navigator.pop(context, true);
+    note.date = DateFormat.yMMMd().format(DateTime.now());
+    int result;
+    if (note.id != null) {
+      result = await dbHelper.updateNote(note);
+    } else {
+      result = await dbHelper.insertNote(note);
+    }
+    if (result != 0) {
+      _showAlertDialog('Status', 'Noe saved successfully');
+    } else {
+      _showAlertDialog('Status', 'Error, not saved');
     }
   }
 }

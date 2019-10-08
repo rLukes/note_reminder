@@ -16,7 +16,7 @@ class _NoteListState extends State<NoteList> {
 
   @override
   Widget build(BuildContext context) {
-    if (noteList != null) {
+    if (noteList == null) {
       noteList = List<Note>();
       updateListView();
     }
@@ -29,7 +29,7 @@ class _NoteListState extends State<NoteList> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
-          navigateToDetail(Note('','',2), 'Add Note');
+          navigateToDetail(Note('', '', 2), 'Add Note');
         },
       ),
     );
@@ -111,12 +111,15 @@ class _NoteListState extends State<NoteList> {
     Scaffold.of(ctx).showSnackBar(snackBar);
   }
 
-  void navigateToDetail(Note note, String title) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return NoteDetail(note: note,
+  void navigateToDetail(Note note, String title) async {
+    bool result =
+        await Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return NoteDetail(
+        note: note,
         title: title,
       );
     }));
+     if(result == true)updateListView();
   }
 
   void updateListView() {
@@ -127,6 +130,8 @@ class _NoteListState extends State<NoteList> {
         setState(() {
           this.noteList = list;
           this.count = noteList.length;
+          print("dfsfdsfsf: "+count.toString());
+          print("lengt "+noteList.length.toString());
         });
       });
     });
