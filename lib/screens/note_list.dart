@@ -29,21 +29,14 @@ class _NoteListState extends State<NoteList> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return NoteDetail(
-              title: "Add Note",
-            );
-          }));
+          navigateToDetail(Note('','',2), 'Add Note');
         },
       ),
     );
   }
 
   getNoteListView() {
-    TextStyle titleStyle = Theme
-        .of(context)
-        .textTheme
-        .subhead;
+    TextStyle titleStyle = Theme.of(context).textTheme.subhead;
     return ListView.builder(
       itemBuilder: (BuildContext context, int index) {
         Note currentNote = this.noteList[index];
@@ -67,14 +60,7 @@ class _NoteListState extends State<NoteList> {
               },
             ),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) {
-                  return NoteDetail(
-                    title: "Edit Note",
-                  );
-                }),
-              );
+              navigateToDetail(currentNote, 'Edit Note');
             },
           ),
         );
@@ -123,6 +109,14 @@ class _NoteListState extends State<NoteList> {
   void _showSnackBar(BuildContext ctx, String msg) {
     final snackBar = SnackBar(content: Text(msg));
     Scaffold.of(ctx).showSnackBar(snackBar);
+  }
+
+  void navigateToDetail(Note note, String title) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return NoteDetail(note: note,
+        title: title,
+      );
+    }));
   }
 
   void updateListView() {

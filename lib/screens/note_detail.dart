@@ -1,22 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:note_reminder/model/note.dart';
+import 'package:note_reminder/utils/db_helper.dart';
 
 class NoteDetail extends StatefulWidget {
   final String title;
+  Note note;
 
-  NoteDetail({this.title});
+  NoteDetail({this.note, this.title});
 
   @override
-  _NoteDetailState createState() => _NoteDetailState();
+  _NoteDetailState createState() => _NoteDetailState(this.note);
 }
 
 class _NoteDetailState extends State<NoteDetail> {
+  Note note;
   static var _priorities = ['Hight', 'Low'];
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  DatabaseHelper dbHelper = DatabaseHelper();
+
+  _NoteDetailState(this.note);
 
   @override
   Widget build(BuildContext context) {
     TextStyle txtStyle = Theme.of(context).textTheme.title;
+    titleController.text = note.title;
+    descriptionController.text = note.description;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -108,5 +117,16 @@ class _NoteDetailState extends State<NoteDetail> {
         ),
       ),
     );
+  }
+
+  void getPriorityValue(String value) {
+    switch (value) {
+      case 'High':
+        note.priority = 1;
+        break;
+      case 'Low':
+        note.priority = 2;
+        break;
+    }
   }
 }

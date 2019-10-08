@@ -87,11 +87,11 @@ class DatabaseHelper {
   }
 
   Future<List<Note>> getNoteList() async {
-    var noteMapLIst = await getNoteMapList();
-    int count = noteMapLIst.length;
+    var noteMapList = await getNoteMapList();
+    int count = noteMapList.length;
     List<Note> noteList = List<Note>();
     for (int i = 0; i < count; i++) {
-      noteList.add(Note.fromMap(noteMapLIst[i]));
+      noteList.add(Note.fromMap(noteMapList[i]));
     }
     return noteList;
   }
